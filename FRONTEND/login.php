@@ -1,100 +1,42 @@
-<?php 
-
+<?php
 session_start();
+include_once('connection.php');
 
-	include("connection.php");
-	include("functions.php");
+if (isset($_POST['login'])) {
 
+    $username = $_POST['username'];
+    $password = md5($_POST['password']);
 
-	if($_SERVER['REQUEST_METHOD'] == "POST")
-	{
-		//something was posted
-		$user_name = $_POST['user_name'];
-		$password = $_POST['password'];
+    $sql = "SELECT * FROM `tbl_user` WHERE `username`='$username' AND `password`='$password'";
+    $result = mysqli_query($conn, $sql);
 
-		if(!empty($user_name) && !empty($password) && !is_numeric($user_name))
-		{
-
-			//read from database
-			$query = "select * from users where user_name = '$user_name' limit 1";
-			$result = mysqli_query($con, $query);
-
-			if($result)
-			{
-				if($result && mysqli_num_rows($result) > 0)
-				{
-
-					$user_data = mysqli_fetch_assoc($result);
-					
-					if($user_data['password'] === $password)
-					{
-
-						$_SESSION['user_id'] = $user_data['user_id'];
-						header("Location: index.php");
-						die;
-					}
-				}
-			}
-			
-			echo "wrong username or password!";
-		}else
-		{
-			echo "wrong username or password!";
-		}
-	}
-
-?>
+    if (empty($_POST['username']) && empty($_POST['password'])) {
+        echo "<script>alert('Please Fill Username and Password');</script>";
+        exit;
+    } elseif (empty($_POST['password'])) {
+        echo "<script>alert('Please Fill Password');</script>";
+        exit;
+    } elseif (empty($_POST['username'])) {
+        echo "<script>alert('Please Fill Username);</script>";
+        exit;
+    } else {
+        if (mysqli_num_rows($result) > 0) {
+            $row = mysqli_fetch_array($result);
+            $name = $row['name'];
+            $username = $row['username'];
+            $password = $row['password'];
 
 
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Login</title>
-</head>
-<body>
+            if ($username == $username && $password == $password) {
+                $_SESSION['name'] = $name;
+                $_SESSION['username'] = $username;
+                $_SESSION['password'] = $password;
+                header('location:welcome.php');
+            }
+        } else {
+            echo "<script>alert('Invalid Username or Password');</script>";
+            exit;
+        }
+    }
 
-	<style type="text/css">
-	
-	#text{
-
-		height: 25px;
-		border-radius: 5px;
-		padding: 4px;
-		border: solid thin #aaa;
-		width: 100%;
-	}
-
-	#button{
-
-		padding: 10px;
-		width: 100px;
-		color: white;
-		background-color: lightblue;
-		border: none;
-	}
-
-	#box{
-
-		background-color: grey;
-		margin: auto;
-		width: 300px;
-		padding: 20px;
-	}
-
-	</style>
-
-	<div id="box">
-		
-		<form method="post">
-			<div style="font-size: 20px;margin: 10px;color: white;">Login</div>
-
-			<input id="text" type="text" name="user_name"><br><br>
-			<input id="text" type="password" name="password"><br><br>
-
-			<input id="button" type="submit" value="Login"><br><br>
-
-			<a href="signup.php">Click to Signup</a><br><br>
-		</form>
-	</div>
-</body>
-</html>
+}

@@ -1,12 +1,14 @@
 <?php
+$server = 'localhost';
+$username = 'root';
+$password = '';
+$database = 'login_register_db';
 
-$dbhost = "localhost";
-$dbuser = "root";
-$dbpass = "";
-$dbname = "login_sample_db";
+if (isset($_POST))
 
-if(!$con = mysqli_connect($dbhost,$dbuser,$dbpass,$dbname))
-{
-
-	die("failed to connect!");
+    $conn = new mysqli($server, $username, $password, $database);
+if ($conn) {
+    // echo 'Server Connected Success';
+} else {
+    die(mysqli_error($conn));
 }
